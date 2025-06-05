@@ -1,0 +1,179 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulchowk Campus - Institute of Engineering</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            transition: opacity 0.3s;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Header -->
+    <header class="bg-blue-800 text-white py-6">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl font-bold">Pulchowk Campus</h1>
+            <p class="mt-2 text-lg">Institute of Engineering, Tribhuvan University</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="bg-blue-600 sticky top-0 shadow-md">
+        <div class="container mx-auto px-4 py-4">
+            <ul class="flex justify-center space-x-6">
+                <li><a href="#home" class="text-white hover:text-gray-200">Home</a></li>
+                <li><a href="#academics" class="text-white hover:text-gray-200">Academics</a></li>
+                <li><a href="#facilities" class="text-white hover:text-gray-200">Facilities</a></li>
+                <li><a href="#contact" class="text-white hover:text-gray-200">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Home Section -->
+        <section id="home" class="mb-12">
+            <h2 class="text-3xl font-bold mb-4">Welcome to Pulchowk Campus</h2>
+            <p class="text-lg text-gray-700">
+                Pulchowk Campus, located in Lalitpur, Nepal, is the central campus of the Institute of Engineering (IOE) under Tribhuvan University. Established in 1972, it is renowned for its excellence in engineering education and research, producing skilled professionals who contribute globally.
+            </p>
+            <img src="pulchowk.jpg" alt="Pulchowk Campus" class="mt-4 rounded-lg shadow-lg w-full h-auto">
+        </section>
+
+        <!-- Academics Section -->
+        <section id="academics" class="mb-12">
+            <h2 class="text-3xl font-bold mb-4">Academics</h2>
+            <p class="text-lg text-gray-700">
+                Pulchowk Campus offers a wide range of undergraduate, graduate, and doctoral programs in various engineering disciplines, including:
+            </p>
+            <ul class="list-disc list-inside mt-4 text-gray-700">
+                <li>Civil Engineering</li>
+                <li>Electrical Engineering</li>
+                <li>Mechanical Engineering</li>
+                <li>Computer Engineering</li>
+                <li>Electronics, Communication and Information Engineering</li>
+                <li>Architecture</li>
+            </ul>
+            <p class="mt-4 text-lg text-gray-700">
+                The campus is known for its rigorous academic standards, experienced faculty, and state-of-the-art laboratories, ensuring students receive a world-class education.
+            </p>
+        </section>
+
+        <!-- Facilities Section -->
+        <section id="facilities" class="mb-12">
+            <h2 class="text-3xl font-bold mb-4">Facilities</h2>
+            <p class="text-lg text-gray-700">
+                Pulchowk Campus provides top-notch facilities to support academic and extracurricular activities, including:
+            </p>
+            <ul class="list-disc list-inside mt-4 text-gray-700">
+                <li>Advanced laboratories for research and practical learning</li>
+                <li>A central library with extensive resources</li>
+                <li>Hostel accommodations for students</li>
+                <li>Sports facilities and recreational areas</li>
+                <li>High-speed internet and IT infrastructure</li>
+            </ul>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="mb-12">
+            <h2 class="text-3xl font-bold mb-4">Contact Us</h2>
+            <p class="text-lg text-gray-700">
+                Get in touch with Pulchowk Campus for more information:
+            </p>
+            <p class="mt-4 text-gray-700">
+                <strong>Address:</strong> Pulchowk, Lalitpur, Nepal<br>
+                <strong>Phone:</strong> +977-1-5521317<br>
+                <strong>Email:</strong> info@ioe.edu.np<br>
+                <strong>Website:</strong> <a href="https://pcampus.edu.np" class="text-blue-600 hover:underline">pcampus.edu.np</a>
+            </p>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-800 text-white py-6">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 Pulchowk Campus, Institute of Engineering. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" class="scroll-to-top bg-blue-600 text-white p-3 rounded-full shadow-lg">
+        ↑
+    </button>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Scroll to Top Button
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollToTopBtn.style.display = 'block';
+            } else {
+                scrollToTopBtn.style.display = 'none';
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>
